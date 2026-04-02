@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hitster Bingo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        .card {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 100%;
+            border: 3px solid #ff00ff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #000;
+        }
+
+        .cell:hover {
+            transform: scale(0.95);
+            opacity: 0.9;
+        }
+
+        .cell.marked::before,
+        .cell.marked::after {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 4px;
+            background: #000;
+            border-radius: 2px;
+        }
+
+        .cell.marked::before {
+            transform: rotate(45deg);
+        }
+
+        .cell.marked::after {
+            transform: rotate(-45deg);
+        }
+
+        .yellow {
+            background: linear-gradient(135deg, #fff176, #fdd835);
+        }
+
+        .green {
+            background: linear-gradient(135deg, #81c784, #4caf50);
+        }
+
+        .blue {
+            background: linear-gradient(135deg, #64b5f6, #2196f3);
+        }
+
+        .pink {
+            background: linear-gradient(135deg, #f48fb1, #ec407a);
+        }
+
+        .purple {
+            background: linear-gradient(135deg, #ba68c8, #9c27b0);
+        }
+
+        .title {
+            text-align: center;
+            color: #ff00ff;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .text-area {
+            width: 100%;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 15px;
+            resize: none;
+            font-family: 'Arial', sans-serif;
+            min-height: 80px;
+        }
+
+        .text-area:focus {
+            outline: 2px solid #ff00ff;
+        }
+
+        .button {
+            width: 100%;
+            background: linear-gradient(135deg, #ff00ff, #ff1493);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.5);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="grid" id="grid"></div>
+        <div class="title">HITSTER</div>
+        <textarea class="text-area" id="textArea" placeholder="Escribe aquí..."></textarea>
+        <button class="button" onclick="clearText()">Borrar Texto</button>
+    </div>
+
+    <script>
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const colors = shuffle([
+            'yellow', 'blue', 'purple', 'green', 'blue',
+            'yellow', 'pink', 'blue', 'pink', 'yellow',
+            'green', 'purple', 'green', 'yellow', 'pink',
+            'pink', 'blue', 'purple', 'pink', 'purple',
+            'yellow', 'purple', 'green', 'blue', 'green'
+        ]);
+
+        const grid = document.getElementById('grid');
+
+        colors.forEach((color, index) => {
+            const cell = document.createElement('div');
+            cell.className = `cell ${color}`;
+            cell.onclick = function () {
+                this.classList.toggle('marked');
+            };
+            grid.appendChild(cell);
+        });
+
+        function clearText() {
+            document.getElementById('textArea').value = '';
+        }
+    </script>
+</body>
+
+</html>

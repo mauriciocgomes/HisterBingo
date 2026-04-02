@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://jorgeff.com/tools/hitster.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hitster Bingo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            transition: background-color 0.4s ease-out;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #instruction {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            pointer-events: none;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #mode-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        #mode-card {
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 24px;
+            padding: 28px;
+            width: min(520px, 92vw);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        #mode-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .mode-btn {
+            appearance: none;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.26);
+        }
+
+        .mode-btn:active {
+            transform: translateY(0);
+        }
+
+        body.active #instruction {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+
+        #history-bar {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            max-width: 85%;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #history-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .history-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #instruction {
+                font-size: 1.8rem;
+            }
+
+            #history-bar {
+                bottom: 20px;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .history-dot {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mode-overlay">
+        <div id="mode-card">
+            <div id="mode-title">Antes de iniciar, escolher</div>
+            <div class="mode-buttons">
+                <button class="mode-btn" id="mode-beginner" type="button">Principiantes</button>
+                <button class="mode-btn" id="mode-expert" type="button">Especialistas</button>
+            </div>
+        </div>
+    </div>
+    <div id="instruction">Tap to Spin</div>
+    <div id="history-bar"></div>
+
+    <script>
+        const MODES = {
+            Principiantes: [
+                { text: '2 anos para cima ou para baixo', color: '#3399FF' },
+                { text: '4 anos para cima ou para baixo', color: '#e7e74e' },
+                { text: 'Antes de 2000?', color: '#FF3399' },
+                { text: 'Década', color: '#9933FF' },
+                { text: 'Grupo ou artista a solo', color: '#52c952' }
+            ],
+            Especialistas: [
+                { text: '3 anos para cima ou para baixo', color: '#3399FF' },
+                { text: 'Nome do grupo ou do cantor', color: '#e7e74e' },
+                { text: 'Ano exato', color: '#FF3399' },
+                { text: 'Década', color: '#9933FF' },
+                { text: 'Nome da música', color: '#52c952' }
+            ]
+        };
+
+        const bar = document.getElementById('history-bar');
+        const text = document.getElementById('instruction');
+        const overlay = document.getElementById('mode-overlay');
+        const beginnerBtn = document.getElementById('mode-beginner');
+        const expertBtn = document.getElementById('mode-expert');
+        let started = false;
+        let selectedMode = null;
+
+        const pickRandom = (items) => items[Math.floor(Math.random() * items.length)];
+
+        const setMode = (modeName) => {
+            selectedMode = modeName;
+            overlay.style.display = 'none';
+            text.innerText = 'Tap to Spin';
+        };
+
+        beginnerBtn.onclick = (e) => {
+            e.stopPropagation();
+            setMode('Principiantes');
+        };
+
+        expertBtn.onclick = (e) => {
+            e.stopPropagation();
+            setMode('Especialistas');
+        };
+
+        document.body.onclick = () => {
+            if (!selectedMode) return;
+
+            const item = pickRandom(MODES[selectedMode]);
+            const color = item.color;
+
+            document.body.style.backgroundColor = '#1a1a1a';
+
+            setTimeout(() => {
+                document.body.style.backgroundColor = color;
+
+                if (!started) {
+                    started = true;
+                    document.body.classList.add('active');
+                }
+
+                text.innerText = item.text;
+
+                const dot = document.createElement('div');
+                dot.className = 'history-dot';
+                dot.style.backgroundColor = color;
+                bar.prepend(dot);
+            }, 150);
+        };
+    </script>
+
+
+</body></html>
