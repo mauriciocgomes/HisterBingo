@@ -145,6 +145,29 @@
         .button:active {
             transform: translateY(0);
         }
+
+        #bingo-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 1000;
+        }
+
+        #bingo-text {
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid #ff00ff;
+            color: #FFFFFF;
+            padding: 24px 34px;
+            border-radius: 18px;
+            font-size: 64px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            text-shadow: 0 0 18px rgba(255, 0, 255, 0.7);
+            user-select: none;
+        }
     </style>
 </head>
 
@@ -152,8 +175,12 @@
     <div class="card">
         <div class="grid" id="grid"></div>
         <div class="title">HITSTER</div>
-        <textarea class="text-area" id="textArea" placeholder="Escribe aquí..."></textarea>
-        <button class="button" onclick="clearText()">Borrar Texto</button>
+        <textarea class="text-area" id="textArea" placeholder="Escrever aqui..."></textarea>
+        <button class="button" onclick="clearText()">Apagar Texto</button>
+    </div>
+
+    <div id="bingo-overlay">
+        <div id="bingo-text">BINGO</div>
     </div>
 
     <script>
@@ -174,12 +201,50 @@
         ]);
 
         const grid = document.getElementById('grid');
+        const bingoOverlay = document.getElementById('bingo-overlay');
+
+        const isMarked = (r, c) => {
+            const idx = r * 5 + c;
+            const cell = grid.children[idx];
+            return cell && cell.classList.contains('marked');
+        };
+
+        const hasBingo = () => {
+            for (let r = 0; r < 5; r++) {
+                let ok = true;
+                for (let c = 0; c < 5; c++) ok = ok && isMarked(r, c);
+                if (ok) return true;
+            }
+
+            for (let c = 0; c < 5; c++) {
+                let ok = true;
+                for (let r = 0; r < 5; r++) ok = ok && isMarked(r, c);
+                if (ok) return true;
+            }
+
+            let diag1 = true;
+            let diag2 = true;
+            for (let i = 0; i < 5; i++) {
+                diag1 = diag1 && isMarked(i, i);
+                diag2 = diag2 && isMarked(i, 4 - i);
+            }
+            return diag1 || diag2;
+        };
+
+        const updateBingoOverlay = () => {
+            bingoOverlay.style.display = hasBingo() ? 'flex' : 'none';
+        };
+
+        bingoOverlay.onclick = () => {
+            bingoOverlay.style.display = 'none';
+        };
 
         colors.forEach((color, index) => {
             const cell = document.createElement('div');
             cell.className = `cell ${color}`;
             cell.onclick = function () {
                 this.classList.toggle('marked');
+                updateBingoOverlay();
             };
             grid.appendChild(cell);
         });
